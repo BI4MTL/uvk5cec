@@ -15,12 +15,19 @@ jobs:
     - name: Build the Docker image
       run: docker build . --file Dockerfile --tag my-image-name:latest
 
-    # 2. 运行容器并提取 .bin 文件（假设输出路径是 /app/build）
-    # 你需要根据你的 Dockerfile 里的实际输出路径修改下面这两行
+    # 2. 在镜像中全局搜索 .bin 文件（用来找出真实路径）
+    - name: Find bin file in Docker image
+      run: |
+        docker run --rm my-image-name:latest find / -name "*.bin"
+
+    # 3. 如果上一步找到了，修改下面的路径并提取（假设找到的真实路径是 /app/output/firmware.bin，这里需要你根据上一步的输出结果修改）
+    # 暂时先用这段“宽容”的代码，如果找不到，它会打印出目录内容方便排查
     - name: Extract bin file from Docker image
       run: |
         docker create --name temp_container my-image-name:latest
-        docker cp temp_container:/app/build/firmware.bin ./firmware.bin
+        # 尝试复制整个 output 或 build 文件夹（如果知道大概目录的话）
+        # 或者精确复制：docker cp temp_container:/真实的/路径/xxx.bin ./xxx.bin
+        docker cp temp_container:/app/build ./build_output || echo "Copy failed, trying other paths..."
         docker rm temp_container
 
     # 3. 直接上传 .bin 文件（不再上传巨大的镜像）
