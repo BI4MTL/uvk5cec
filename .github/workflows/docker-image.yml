@@ -24,6 +24,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: recursive
 
       # The flash budget is a few hundred bytes, so the compiler version is not
       # cosmetic: pin the toolchain the project is developed against (see
