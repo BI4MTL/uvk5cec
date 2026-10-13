@@ -3,8 +3,6 @@ name: Docker Image CI
 on:
   push:
     branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
 
 jobs:
   build:
@@ -13,17 +11,21 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    # 1. 构建 Docker 镜像（将标签改为固定的 latest）
+    # 1. 构建 Docker 镜像
     - name: Build the Docker image
       run: docker build . --file Dockerfile --tag my-image-name:latest
 
-    # 2. 将 Docker 镜像保存为 tar 压缩包
-    - name: Save Docker image to tar
-      run: docker save -o my-image.tar my-image-name:latest
+    # 2. 运行容器并提取 .bin 文件（假设输出路径是 /app/build）
+    # 你需要根据你的 Dockerfile 里的实际输出路径修改下面这两行
+    - name: Extract bin file from Docker image
+      run: |
+        docker create --name temp_container my-image-name:latest
+        docker cp temp_container:/app/build/firmware.bin ./firmware.bin
+        docker rm temp_container
 
-    # 3. 上传 tar 压缩包，生成下载链接
-    - name: Upload Docker image artifact
+    # 3. 直接上传 .bin 文件（不再上传巨大的镜像）
+    - name: Upload bin artifact
       uses: actions/upload-artifact@v4
       with:
-        name: docker-image-download  # 下载链接显示的名字
-        path: my-image.tar           # 要上传的文件路径
+        name: firmware-bin
+        path: ./firmware.bin
