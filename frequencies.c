@@ -31,8 +31,8 @@ const freq_band_table_t frequencyBandTable[] =
 {
 	#ifndef ENABLE_WIDE_RX
 		// QS original
-		[BAND1_50MHz ]={.lower =  5000000,  .upper =  7600000},
-		[BAND7_470MHz]={.lower = 47000000,  .upper = 60000000},
+		[BAND1_50MHz ]={.lower =  5000000,  .upper =  108000000},
+        [BAND7_470MHz]={.lower = 47000000,  .upper = 1300000000},
 	#else
 		// extended range
 		[BAND1_50MHz ]={.lower =  BX4819_band1_lower, .upper =  10800000},
